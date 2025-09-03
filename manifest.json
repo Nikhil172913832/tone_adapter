@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Telegram Scraper",
+  "version": "1.0",
+  "permissions": ["scripting", "activeTab"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.telegram.org/*",
+        "https://web.telegram.org/z/*",
+        "https://web.telegram.org/a/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}
