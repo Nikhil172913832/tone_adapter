@@ -1,17 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Telegram Scraper",
+  "name": "Tone Adapter",
   "version": "1.0",
   "permissions": ["scripting", "activeTab"],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
   },
   "content_scripts": [
     {
       "matches": [
-        "https://web.telegram.org/*",
-        "https://web.telegram.org/z/*",
-        "https://web.telegram.org/a/*"
+        "https://web.telegram.org/*"
       ],
       "js": ["content.js"]
     }
