@@ -1,12 +1,28 @@
-// Import the analyzer functions
-import { analyzeChatMessages, saveToneProfile, getToneProfile } from './analyzer/analyze-chat.js';
-
 // Store the current chat ID and messages
 let currentChatId = null;
 let currentMessages = [];
+let analyzer = null;
 
 // Initialize the extension
-initToneAdapter();
+async function loadAndInit() {
+    try {
+        // Dynamically import the analyzer module
+        const module = await import(chrome.runtime.getURL('analyzer/analyze-chat.js'));
+        analyzer = {
+            analyzeChatMessages: module.analyzeChatMessages,
+            saveToneProfile: module.saveToneProfile,
+            getToneProfile: module.getToneProfile
+        };
+        
+        // Now initialize the extension
+        initToneAdapter();
+    } catch (error) {
+        console.error('Failed to load analyzer module:', error);
+    }
+}
+
+// Start the loading process
+loadAndInit();
 
 async function initToneAdapter() {
   logChatTitle();
