@@ -1,0 +1,163 @@
+# Enhanced Tone Profile Specification for LLM Adaptation
+
+This document outlines the comprehensive tone profile structure that enables LLMs to accurately adapt messages to match a user's unique communication style.
+
+## 🎯 Core Communication Style
+
+### Formality Level
+- **formal**: Professional language, no contractions, formal vocabulary
+- **semi-formal**: Some contractions, mixed formal/casual vocabulary  
+- **casual**: Frequent contractions, everyday language, some slang
+- **slang-heavy**: Heavy use of slang, internet abbreviations, informal expressions
+
+### Politeness Style
+- **polite**: Frequent use of "please", "thank you", "could you", apologetic language
+- **neutral**: Standard politeness, balanced directness
+- **direct**: Straightforward communication, minimal politeness markers
+- **blunt**: Very direct, potentially harsh, minimal softening language
+
+### Emotional Tone
+- **positive**: Upbeat, optimistic language and sentiment
+- **neutral**: Balanced emotional expression
+- **negative**: Pessimistic, critical, or frustrated tone
+- **enthusiastic**: High energy, excited, very positive
+- **frustrated**: Annoyed, impatient, or irritated
+- **sarcastic**: Ironic, mocking, or satirical tone
+
+### Communication Conciseness
+- **concise**: Short, to-the-point messages
+- **balanced**: Moderate length, well-structured
+- **verbose**: Long, detailed explanations
+
+### Energy Level
+- **flat**: Low energy, minimal punctuation/emojis
+- **normal**: Standard energy level
+- **high-energy**: Lots of exclamations, emojis, caps
+
+## 🧠 Advanced Personality Traits
+
+### Humor Style
+- **none**: Serious, no humor indicators
+- **subtle**: Occasional light humor
+- **moderate**: Regular use of humor
+- **heavy**: Frequent jokes and humor
+- **sarcastic**: Primarily sarcastic/ironic humor
+
+### Technical Sophistication
+- **non-technical**: No technical terminology
+- **basic**: Simple technical terms
+- **intermediate**: Moderate technical vocabulary
+- **advanced**: Complex technical concepts
+- **expert**: Deep technical expertise
+
+### Empathy Level
+- **low**: Minimal emotional consideration for others
+- **moderate**: Standard empathy
+- **high**: Strong consideration for others' feelings
+- **very-high**: Exceptional empathy and emotional intelligence
+
+### Confidence Level
+- **tentative**: Uncertain, hesitant language
+- **moderate**: Balanced confidence
+- **confident**: Assured, decisive language
+- **assertive**: Strong, commanding presence
+
+## 💬 Communication Patterns
+
+### Question Style
+- **direct**: Straightforward questions
+- **indirect**: Polite, softened questions
+- **rhetorical**: Questions for effect, not answers
+- **clarifying**: Many follow-up questions
+
+### Greeting Style
+- **formal**: "Good morning", "Hello"
+- **casual**: "Hi", "Hey"
+- **warm**: "Hey there", "Hi there"
+- **minimal**: No greetings, straight to point
+
+### Closing Style
+- **formal**: "Sincerely", "Best regards"
+- **casual**: "Bye", "See you"
+- **warm**: "Take care", "Talk soon"
+- **abrupt**: No closings, sudden endings
+
+## 📚 Linguistic Sophistication
+
+### Vocabulary Level
+- **simple**: Basic, everyday words
+- **intermediate**: Standard vocabulary
+- **advanced**: Sophisticated word choice
+- **sophisticated**: Complex, nuanced vocabulary
+
+### Sentence Complexity
+- **simple**: Short, straightforward sentences
+- **compound**: Medium complexity with conjunctions
+- **complex**: Long, intricate sentence structures
+- **varied**: Mix of different complexity levels
+
+### Discourse Markers
+- **minimal**: Few filler words or transitions
+- **moderate**: Some "well", "so", "actually"
+- **frequent**: Regular use of discourse markers
+- **excessive**: Overuse of filler words
+
+## 🎨 Personalization Elements
+
+### Signature Phrases
+Common phrases the person uses repeatedly (e.g., "you know what I mean", "at the end of the day")
+
+### Common Words
+Most frequently used words that define their vocabulary
+
+### Avoided Words
+Words they rarely use despite being common (e.g., avoiding "awesome" or "literally")
+
+### Communication Quirks
+Unique patterns like excessive punctuation, letter repetition, or specific formatting habits
+
+## 🎭 Contextual Behavior
+
+### Response Pattern
+- **immediate**: Quick, short responses
+- **thoughtful**: Considered, well-structured responses
+- **deliberate**: Carefully crafted, precise language
+- **spontaneous**: Varied, stream-of-consciousness style
+
+### Conflict Style
+- **avoidant**: Tries to avoid confrontation
+- **collaborative**: Seeks compromise and solutions
+- **competitive**: Direct confrontation, wants to win
+- **accommodating**: Yields to others' preferences
+
+### Feedback Style
+- **constructive**: Helpful, solution-oriented feedback
+- **direct**: Straightforward, no sugar-coating
+- **gentle**: Soft, considerate feedback
+- **harsh**: Critical, potentially hurtful feedback
+
+## 📊 Detailed Metrics
+
+The system tracks 20+ linguistic metrics including:
+- Contraction, slang, and emoji usage rates
+- Question, interjection, and repetition patterns
+- Vocabulary diversity and sentence complexity
+- Person pronoun usage (I/you/they)
+- Uncertainty vs confidence markers
+- Technical terminology frequency
+- Empathy and humor indicators
+- Time and spatial reference patterns
+
+## 🤖 LLM Integration Guidelines
+
+When adapting messages using this profile:
+
+1. **Match the core style**: Use the same formality, politeness, and energy level
+2. **Incorporate personality traits**: Add appropriate humor, technicality, and empathy
+3. **Follow communication patterns**: Use similar greeting/closing styles and question patterns
+4. **Maintain linguistic sophistication**: Match vocabulary level and sentence complexity
+5. **Include personalization**: Use signature phrases and common words when appropriate
+6. **Respect contextual behavior**: Adapt response style and conflict approach
+7. **Apply detailed metrics**: Use the numerical data to fine-tune language choices
+
+This comprehensive profile enables LLMs to create messages that feel authentically like the person, maintaining their unique voice and communication style across all interactions.

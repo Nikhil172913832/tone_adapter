@@ -2,7 +2,11 @@
   "manifest_version": 3,
   "name": "Tone Adapter",
   "version": "1.0",
-  "permissions": ["scripting", "activeTab"],
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "storage"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
@@ -12,7 +16,14 @@
       "matches": [
         "https://web.telegram.org/*"
       ],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["analyzer/*"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
