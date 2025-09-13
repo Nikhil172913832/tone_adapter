@@ -1,17 +1,10 @@
-// Import the analyzer functions
-import { analyzeChatMessages, saveToneProfile, getToneProfile } from './analyzer/analyze-chat.js';
-
-// Store the current chat ID and messages
 let currentChatId = null;
 let currentMessages = [];
 
-// Initialize the extension
 initToneAdapter();
 
 async function initToneAdapter() {
   logChatTitle();
-  await observeChatChanges();
-  setupMessageListeners();
 }
 
 async function logChatTitle() {
@@ -19,22 +12,25 @@ async function logChatTitle() {
   if (title) {
     console.log('[tone_adapter] Chat title:', title);
     currentChatId = generateChatId(title);
-    await loadAndDisplayToneProfile(currentChatId);
   } else {
     console.log('[tone_adapter] Chat title not found');
   }
 }
+
 function getChatTitle() {
   console.log("[tone_adapter debug] getChatTitle called");
   let container = document.querySelector('title');
   if (container) {
-    if (!container.innerText.includes("Telegram Web")) {
+    if (!container.innerText.includes("Telegram")) {
       return container.innerText;
     }
   }
-  container = document.querySelector('div.user-title');
+  container = document.querySelector('div.top');
+  let temp = document.createElement('div');
+  temp.innerHTML = container.innerHTML;
+  container = temp.querySelector('div.user-title');
   if (container) {
-    const temp = document.createElement('div');
+    temp = document.createElement('div');
     temp.innerHTML = container.innerHTML;
     const span = temp.querySelector('span');
     if (span) {
@@ -44,6 +40,7 @@ function getChatTitle() {
   }
   return null;
 }
+
 function getRecentChatsInDOM() {
   let chatNodes = document.querySelectorAll('div[role="list"] > div[role="listitem"]');
   if (!chatNodes.length) {
@@ -88,6 +85,7 @@ function getRecentChatsInDOM() {
     return { title, preview };
   });
 }
+
 function getCurrentVisibleMessages(maxMessages = 50) {
   let selectors = [
     'div.text-content.clearfix.with-meta',
@@ -137,110 +135,9 @@ function getCurrentVisibleMessages(maxMessages = 50) {
   console.log(`[tone_adapter debug] Returning ${messages.length} pure chat messages`);
   return messages;
 }
-// Generate a unique ID for the chat
 function generateChatId(chatTitle) {
   return btoa(chatTitle).substring(0, 32);
 }
-
-// Observe chat changes and update analysis
-async function observeChatChanges() {
-  const observer = new MutationObserver(async (mutations) => {
-    const messages = getCurrentVisibleMessages();
-    if (messages.length !== currentMessages.length) {
-      currentMessages = messages;
-      if (currentChatId && messages.length > 0) {
-        await analyzeAndStoreToneProfile(currentChatId, messages);
-      }
-    }
-  });
-
-  // Start observing the chat container
-  const chatContainer = document.querySelector('[role="log"], .messages-container, .chat-container');
-  if (chatContainer) {
-    observer.observe(chatContainer, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
-  }
-}
-
-// Analyze messages and store the tone profile
-async function analyzeAndStoreToneProfile(chatId, messages) {
-  try {
-    console.log(`[tone_adapter] Analyzing ${messages.length} messages for chat ${chatId}`);
-    const toneProfile = await analyzeChatMessages(messages);
-    
-    if (toneProfile) {
-      await saveToneProfile(chatId, toneProfile);
-      await updateToneProfileUI(toneProfile);
-    }
-  } catch (error) {
-    console.error('[tone_adapter] Error in analyzeAndStoreToneProfile:', error);
-  }
-}
-
-// Load and display the tone profile for the current chat
-async function loadAndDisplayToneProfile(chatId) {
-  const toneProfile = await getToneProfile(chatId);
-  if (toneProfile) {
-    await updateToneProfileUI(toneProfile);
-  }
-}
-
-// Update the UI to show the tone profile
-async function updateToneProfileUI(toneProfile) {
-  // Remove existing tone profile if it exists
-  let container = document.getElementById('tone-adapter-profile');
-  
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'tone-adapter-profile';
-    container.style.position = 'fixed';
-    container.style.bottom = '20px';
-    container.style.right = '20px';
-    container.style.padding = '10px';
-    container.style.background = '#ffffff';
-    container.style.border = '1px solid #e0e0e0';
-    container.style.borderRadius = '8px';
-    container.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-    container.style.zIndex = '9999';
-    container.style.maxWidth = '300px';
-    container.style.fontFamily = 'Arial, sans-serif';
-    container.style.fontSize = '14px';
-    document.body.appendChild(container);
-  }
-
-  // Create HTML for the tone profile
-  container.innerHTML = `
-    <div style="margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 4px;">
-      💬 Tone Profile
-    </div>
-    <div style="margin-bottom: 4px;"><strong>Formality:</strong> ${toneProfile.formality}</div>
-    <div style="margin-bottom: 4px;"><strong>Politeness:</strong> ${toneProfile.politeness}</div>
-    <div style="margin-bottom: 4px;"><strong>Emotion:</strong> ${toneProfile.emotion}</div>
-    <div style="margin-bottom: 4px;"><strong>Energy:</strong> ${toneProfile.energy}</div>
-    <div style="margin-top: 8px; font-size: 12px; color: #666;">
-      Last updated: ${new Date().toLocaleTimeString()}
-    </div>
-  `;
-}
-
-// Set up message listeners
-function setupMessageListeners() {
-  // Listen for messages from the background script
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === 'getToneProfile' && currentChatId) {
-      getToneProfile(currentChatId).then(profile => {
-        sendResponse({ toneProfile: profile });
-      });
-      return true; // Will respond asynchronously
-    }
-    return false;
-  });
-}
-
-// Handle incoming messages from the extension
 chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.type === "getRecentChats") {
     const chats = getRecentChatsInDOM();
