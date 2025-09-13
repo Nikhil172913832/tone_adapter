@@ -10,7 +10,7 @@ export function analyzeVocabularyLevel(texts: string): ToneProfile['vocabularyLe
 	
 	if (vocabularyDiversity > 0.7) return 'sophisticated';
 	else if (vocabularyDiversity > 0.6) return 'advanced';
-	else if (vocabularyDiversity < 0.4) return 'simple';
+	else if (vocabularyDiversity < 0.4) return 'basic';
 	else return 'intermediate';
 }
 

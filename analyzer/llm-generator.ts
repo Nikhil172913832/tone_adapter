@@ -19,7 +19,8 @@ import {
   SentenceComplexity, 
   DiscourseMarkers, 
   ConflictStyle, 
-  FeedbackStyle 
+  FeedbackStyle, 
+  InterruptionStyle
 } from './tone-profile';
 import { validateToneProfile } from './validation';
 
@@ -48,6 +49,21 @@ const createKeyValue = <T extends string>(
 ): string => `**${key}**: ${value} - ${descriptions[value] || 'No description available'}`;
 
 // Description maps for each tone profile property
+const INTERRUPTION_STYLE_DESCRIPTIONS: DescriptionMap<InterruptionStyle> = {
+  'frequent': 'Interrupts often during conversation',
+  'moderate': 'Occasionally interrupts, but not disruptive',
+  'rare': 'Rarely interrupts, generally waits for others to finish',
+  'never': 'Never interrupts, always waits for others to finish speaking'
+};
+
+const RESPONSE_PATTERN_DESCRIPTIONS: DescriptionMap<'quick' | 'deliberate' | 'thoughtful' | 'reactive' | 'spontaneous' | 'immediate'> = {
+  'quick': 'Responds rapidly, often without delay',
+  'deliberate': 'Takes time to consider before responding',
+  'thoughtful': 'Gives well-considered, reflective responses',
+  'reactive': 'Responds directly to the previous message',
+  'spontaneous': 'Responds in an unplanned, impulsive manner',
+  'immediate': 'Replies instantly, with little to no pause'
+};
 const FORMALITY_DESCRIPTIONS: DescriptionMap<Formality> = {
   'formal': 'Professional language, no contractions, formal vocabulary',
   'semi-formal': 'Some contractions, mixed formal/casual vocabulary',
@@ -58,26 +74,33 @@ const FORMALITY_DESCRIPTIONS: DescriptionMap<Formality> = {
 const POLITENESS_DESCRIPTIONS: DescriptionMap<Politeness> = {
   'polite': 'Frequent use of "please", "thank you", "could you", apologetic language',
   'direct': 'Straightforward communication, minimal politeness markers',
-  'blunt': 'Very direct, potentially harsh, minimal softening language'
+  'blunt': 'Very direct, potentially harsh, minimal softening language',
+  'neutral': 'Neither overtly polite nor impolite; balanced tone'
 };
 
 const EMOTION_DESCRIPTIONS: DescriptionMap<Emotion> = {
   'positive': 'Upbeat, optimistic language and sentiment',
   'negative': 'Pessimistic, critical, or frustrated tone',
   'neutral': 'Balanced emotional expression',
-  'mixed': 'Combination of different emotional tones'
+  'mixed': 'Combination of different emotional tones',
+  'sarcastic': 'Ironic, mocking, or satirical emotional tone',
+  'enthusiastic': 'Excited, passionate, and energetic emotional tone',
+  'frustrated': 'Impatient, annoyed, or dissatisfied emotional tone'
 };
 
 const CONCISENESS_DESCRIPTIONS: DescriptionMap<Conciseness> = {
   'concise': 'Short, to-the-point messages',
   'detailed': 'Thorough explanations with additional context',
-  'verbose': 'Lengthy, detailed communications with extensive explanations'
+  'verbose': 'Lengthy, detailed communications with extensive explanations',
+  'balanced': 'Balanced between concise and detailed'
 };
 
 const ENERGY_DESCRIPTIONS: DescriptionMap<Energy> = {
   'high-energy': 'Lots of exclamations, emojis, caps',
   'moderate': 'Balanced energy level',
-  'low-energy': 'Calm, measured, minimal emphasis'
+  'low-energy': 'Calm, measured, minimal emphasis',
+  'flat': 'Monotone, lacking energy',
+  'normal': 'Standard, expected energy level'
 };
 
 // ... (other description maps)
@@ -118,6 +141,7 @@ export function generateLLMToneProfile(profile: ToneProfile): string {
       `**Question Style**: ${profile.questionStyle} - ${getQuestionStyleDescription(profile.questionStyle)}`,
       `**Greeting Style**: ${profile.greetingStyle} - ${getGreetingStyleDescription(profile.greetingStyle)}`,
       `**Closing Style**: ${profile.closingStyle} - ${getClosingStyleDescription(profile.closingStyle)}`,
+      `**Interruption Style**: ${profile.interruptionStyle} - ${getInterruptionStyleDescription(profile.interruptionStyle)}`,
       `**Response Pattern**: ${profile.responsePattern} - ${getResponsePatternDescription(profile.responsePattern)}`
     ]),
     
@@ -181,47 +205,58 @@ const HUMOR_DESCRIPTIONS: DescriptionMap<Humor> = {
   'subtle': 'Occasional, understated humor',
   'moderate': 'Regular but balanced use of humor',
   'sarcastic': 'Ironic, mocking, or satirical humor',
-  'playful': 'Light-hearted and fun humor'
+  'playful': 'Light-hearted and fun humor',
+  'heavy': 'Frequent, intense use of humor'
 };
 
 const TECHNICALITY_DESCRIPTIONS: DescriptionMap<Technicality> = {
-  'non-technical': 'No technical terminology used',
-  'semi-technical': 'Basic technical terms with explanations',
-  'highly-technical': 'Advanced technical terminology and concepts'
+  'expert': 'Expert-level technical language and concepts',
+  'advanced': 'Advanced technical terminology and explanations',
+  'intermediate': 'Intermediate technical terms, some explanations',
+  'basic': 'Basic technical terms with explanations',
+  'non-technical': 'No technical terminology used'
 };
 
 const EMPATHY_DESCRIPTIONS: DescriptionMap<Empathy> = {
   'low': 'Minimal emotional consideration for others',
   'moderate': 'Balanced emotional consideration',
-  'high': 'High level of emotional consideration and understanding'
+  'high': 'High level of emotional consideration and understanding',
+  'very-high': 'Exceptionally empathetic and understanding'
 };
 
 const CONFIDENCE_DESCRIPTIONS: DescriptionMap<Confidence> = {
   'low': 'Hesitant, uncertain language',
   'moderate': 'Balanced confidence',
   'high': 'Assertive, self-assured language',
-  'overconfident': 'Overly assertive, potentially dismissive of others'
+  'overconfident': 'Overly assertive, potentially dismissive of others',
+  'assertive': 'Confident and direct, but not overbearing',
+  'confident': 'Self-assured and positive',
+  'tentative': 'Cautious, hesitant, or unsure'
 };
 
 const QUESTION_STYLE_DESCRIPTIONS: DescriptionMap<QuestionStyle> = {
   'rhetorical': 'Questions used for effect rather than to get information',
   'clarifying': 'Questions that seek to understand better',
   'probing': 'In-depth questions that explore a topic',
-  'leading': 'Questions that suggest a particular answer'
+  'leading': 'Questions that suggest a particular answer',
+  'direct': 'Straightforward, explicit questions',
+  'indirect': 'Subtle, implied questions'
 };
 
 const GREETING_STYLE_DESCRIPTIONS: DescriptionMap<GreetingStyle> = {
   'formal': 'Professional, traditional greetings',
   'warm': 'Friendly, welcoming greetings',
   'casual': 'Informal, relaxed greetings',
-  'none': 'No greeting, gets straight to the point'
+  'none': 'No greeting, gets straight to the point',
+  'minimal': 'Minimal or token greeting'
 };
 
 const CLOSING_STYLE_DESCRIPTIONS: DescriptionMap<ClosingStyle> = {
   'formal': 'Professional sign-offs',
   'warm': 'Friendly, personal closings',
   'abrupt': 'Ends messages suddenly',
-  'none': 'No closing, ends with the last point'
+  'none': 'No closing, ends with the last point',
+  'casual': 'Informal, relaxed closing'
 };
 
 const VOCABULARY_LEVEL_DESCRIPTIONS: DescriptionMap<VocabularyLevel> = {
@@ -235,13 +270,15 @@ const SENTENCE_COMPLEXITY_DESCRIPTIONS: DescriptionMap<SentenceComplexity> = {
   'simple': 'Short, straightforward sentences',
   'moderate': 'Mix of simple and complex sentences',
   'complex': 'Longer, more complex sentence structures',
-  'varied': 'Wide range of sentence structures'
+  'varied': 'Wide range of sentence structures',
+  'compound': 'Sentences with two or more independent clauses'
 };
 
 const DISCOURSE_MARKERS_DESCRIPTIONS: DescriptionMap<DiscourseMarkers> = {
   'minimal': 'Few transition words or phrases',
   'moderate': 'Appropriate use of transitions',
-  'excessive': 'Overuse of transition words and phrases'
+  'excessive': 'Overuse of transition words and phrases',
+  'frequent': 'Frequent use of discourse markers'
 };
 
 const CONFLICT_STYLE_DESCRIPTIONS: DescriptionMap<ConflictStyle> = {
@@ -256,7 +293,9 @@ const FEEDBACK_STYLE_DESCRIPTIONS: DescriptionMap<FeedbackStyle> = {
   'direct': 'Straightforward, to-the-point feedback',
   'constructive': 'Balanced feedback with suggestions',
   'sandwich': 'Negative feedback between positive comments',
-  'indirect': 'Subtle, implied feedback'
+  'indirect': 'Subtle, implied feedback',
+  'gentle': 'Soft, kind, and encouraging feedback',
+  'harsh': 'Severe, critical, or blunt feedback'
 };
 
 // Helper functions for descriptions (kept for backward compatibility)
@@ -328,12 +367,10 @@ function getFeedbackStyleDescription(style: FeedbackStyle): string {
   return FEEDBACK_STYLE_DESCRIPTIONS[style] || '';
 }
 
-function getResponsePatternDescription(pattern: string): string {
-  const patterns: Record<string, string> = {
-    'immediate': 'Quick, rapid responses',
-    'thoughtful': 'Deliberate, well-considered responses',
-    'deliberate': 'Carefully crafted responses',
-    'reactive': 'Responses that directly address the previous message'
-  };
-  return patterns[pattern] || 'No specific response pattern detected';
+function getInterruptionStyleDescription(interruptionStyle: InterruptionStyle): string {
+  return INTERRUPTION_STYLE_DESCRIPTIONS[interruptionStyle] || '';
+}
+
+function getResponsePatternDescription(pattern: 'quick' | 'deliberate' | 'thoughtful' | 'reactive' | 'spontaneous' | 'immediate'): string {
+  return RESPONSE_PATTERN_DESCRIPTIONS[pattern] || 'No specific response pattern detected';
 }
