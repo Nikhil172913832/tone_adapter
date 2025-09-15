@@ -151,5 +151,19 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
     sendResponse({ messages, title });
     return true;
   }
+  if (req.type === "getInputBoxMessage") {
+    // Try by id first
+    let inputDiv = document.getElementById('editable-message-text');
+    if (!inputDiv) {
+      // Try by class
+      inputDiv = document.querySelector('div.input-field-input-fake');
+    }
+    let inputMessage = '';
+    if (inputDiv) {
+      inputMessage = inputDiv.innerText || inputDiv.textContent || '';
+    }
+    sendResponse({ inputMessage });
+    return true;
+  }
   return true;
 });
