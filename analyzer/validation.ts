@@ -24,23 +24,23 @@ import type {
 
 // Enums as zod schemas
 const FormalitySchema = z.enum(['formal', 'semi-formal', 'casual', 'slang-heavy']);
-const PolitenessSchema = z.enum(['polite', 'direct', 'blunt']);
-const EmotionSchema = z.enum(['positive', 'negative', 'neutral', 'mixed']);
-const ConcisenessSchema = z.enum(['concise', 'detailed', 'verbose']);
-const EnergySchema = z.enum(['high-energy', 'moderate', 'low-energy']);
-const HumorSchema = z.enum(['none', 'subtle', 'moderate', 'sarcastic', 'playful']);
-const TechnicalitySchema = z.enum(['non-technical', 'semi-technical', 'highly-technical']);
-const EmpathySchema = z.enum(['low', 'moderate', 'high']);
-const ConfidenceSchema = z.enum(['low', 'moderate', 'high', 'overconfident']);
-const QuestionStyleSchema = z.enum(['rhetorical', 'clarifying', 'probing', 'leading']);
-const GreetingStyleSchema = z.enum(['formal', 'warm', 'casual', 'none']);
-const ClosingStyleSchema = z.enum(['formal', 'warm', 'abrupt', 'none']);
+const PolitenessSchema = z.enum(['polite', 'direct', 'blunt', 'neutral']);
+const EmotionSchema = z.enum(['positive', 'negative', 'neutral', 'mixed', 'sarcastic', 'enthusiastic', 'frustrated']);
+const ConcisenessSchema = z.enum(['concise', 'detailed', 'verbose', 'balanced']);
+const EnergySchema = z.enum(['high-energy', 'moderate', 'low-energy', 'flat', 'normal']);
+const HumorSchema = z.enum(['none', 'subtle', 'moderate', 'sarcastic', 'playful', 'heavy']);
+const TechnicalitySchema = z.enum(['expert', 'advanced', 'intermediate', 'basic', 'non-technical']);
+const EmpathySchema = z.enum(['low', 'moderate', 'high', 'very-high']);
+const ConfidenceSchema = z.enum(['low', 'moderate', 'high', 'overconfident', 'assertive', 'confident', 'tentative']);
+const QuestionStyleSchema = z.enum(['rhetorical', 'clarifying', 'probing', 'leading', 'direct', 'indirect']);
+const GreetingStyleSchema = z.enum(['formal', 'warm', 'casual', 'none', 'minimal']);
+const ClosingStyleSchema = z.enum(['formal', 'warm', 'abrupt', 'none', 'casual']);
 const InterruptionStyleSchema = z.enum(['frequent', 'moderate', 'rare', 'never']);
 const VocabularyLevelSchema = z.enum(['basic', 'intermediate', 'advanced', 'sophisticated']);
-const SentenceComplexitySchema = z.enum(['simple', 'moderate', 'complex', 'varied']);
-const DiscourseMarkersSchema = z.enum(['minimal', 'moderate', 'excessive']);
+const SentenceComplexitySchema = z.enum(['simple', 'moderate', 'complex', 'varied', 'compound']);
+const DiscourseMarkersSchema = z.enum(['minimal', 'moderate', 'excessive', 'frequent']);
 const ConflictStyleSchema = z.enum(['avoidant', 'accommodating', 'competitive', 'collaborative', 'compromising']);
-const FeedbackStyleSchema = z.enum(['direct', 'constructive', 'sandwich', 'indirect']);
+const FeedbackStyleSchema = z.enum(['direct', 'constructive', 'sandwich', 'indirect', 'gentle', 'harsh']);
 
 // Metrics schema
 const MetricsSchema: z.ZodType<Metrics> = z.object({
@@ -93,7 +93,7 @@ export const ToneProfileSchema: z.ZodType<ToneProfile> = z.object({
   greetingStyle: GreetingStyleSchema,
   closingStyle: ClosingStyleSchema,
   interruptionStyle: InterruptionStyleSchema,
-  responsePattern: z.enum(['quick', 'deliberate', 'thoughtful', 'reactive']),
+  responsePattern: z.enum(['quick', 'deliberate', 'thoughtful', 'reactive', 'spontaneous', 'immediate']),
 
   // Linguistic Characteristics
   vocabularyLevel: VocabularyLevelSchema,

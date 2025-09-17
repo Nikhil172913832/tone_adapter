@@ -1,26 +1,26 @@
 // Centralized type definitions for tone analysis
 
 export type Formality = 'formal' | 'semi-formal' | 'casual' | 'slang-heavy';
-export type Politeness = 'polite' | 'direct' | 'blunt';
-export type Emotion = 'positive' | 'negative' | 'neutral' | 'mixed';
-export type Conciseness = 'concise' | 'detailed' | 'verbose';
-export type Energy = 'high-energy' | 'moderate' | 'low-energy';
-export type Humor = 'none' | 'subtle' | 'moderate' | 'sarcastic' | 'playful';
-export type Technicality = 'non-technical' | 'semi-technical' | 'highly-technical';
-export type Empathy = 'low' | 'moderate' | 'high';
-export type Confidence = 'low' | 'moderate' | 'high' | 'overconfident';
+export type Politeness = 'polite' | 'direct' | 'blunt' | 'neutral';
+export type Emotion = 'positive' | 'negative' | 'neutral' | 'mixed' | 'sarcastic' | 'enthusiastic' | 'frustrated';
+export type Conciseness = 'concise' | 'detailed' | 'verbose' | 'balanced';
+export type Energy = 'high-energy' | 'moderate' | 'low-energy' | 'flat' | 'normal';
+export type Humor = 'none' | 'subtle' | 'moderate' | 'sarcastic' | 'playful' | 'heavy';
+export type Technicality = 'expert' | 'advanced' | 'intermediate' | 'basic' | 'non-technical';
+export type Empathy = 'low' | 'moderate' | 'high' | 'very-high';
+export type Confidence = 'low' | 'moderate' | 'high' | 'overconfident' | 'assertive' | 'confident' | 'tentative';
 
-export type QuestionStyle = 'rhetorical' | 'clarifying' | 'probing' | 'leading';
-export type GreetingStyle = 'formal' | 'warm' | 'casual' | 'none';
-export type ClosingStyle = 'formal' | 'warm' | 'abrupt' | 'none';
+export type QuestionStyle = 'rhetorical' | 'clarifying' | 'probing' | 'leading' | 'direct' | 'indirect';
+export type GreetingStyle = 'formal' | 'warm' | 'casual' | 'none'| 'minimal';
+export type ClosingStyle = 'formal' | 'warm' | 'abrupt' | 'none' | 'casual';
 export type InterruptionStyle = 'frequent' | 'moderate' | 'rare' | 'never';
 
 export type VocabularyLevel = 'basic' | 'intermediate' | 'advanced' | 'sophisticated';
-export type SentenceComplexity = 'simple' | 'moderate' | 'complex' | 'varied';
-export type DiscourseMarkers = 'minimal' | 'moderate' | 'excessive';
+export type SentenceComplexity = 'simple' | 'moderate' | 'complex' | 'varied' | 'compound';
+export type DiscourseMarkers = 'minimal' | 'moderate' | 'excessive' | 'frequent';
 
 export type ConflictStyle = 'avoidant' | 'accommodating' | 'competitive' | 'collaborative' | 'compromising';
-export type FeedbackStyle = 'direct' | 'constructive' | 'sandwich' | 'indirect';
+export type FeedbackStyle = 'direct' | 'constructive' | 'sandwich' | 'indirect'| 'gentle' | 'harsh';
 
 export interface Metrics {
   contractionRate: number;
@@ -71,7 +71,7 @@ export interface ToneProfile {
   greetingStyle: GreetingStyle;
   closingStyle: ClosingStyle;
   interruptionStyle: InterruptionStyle;
-  responsePattern: 'quick' | 'deliberate' | 'thoughtful' | 'reactive';
+  responsePattern: 'quick' | 'deliberate' | 'thoughtful' | 'reactive' | 'spontaneous' | 'immediate';
 
   // Linguistic Characteristics
   vocabularyLevel: VocabularyLevel;

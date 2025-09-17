@@ -1,6 +1,105 @@
+// import { generateToneProfile, generateLLMToneProfile } from './dist/analyzer/index.js';
+import { rephraseWithGemini } from './gemini.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   const fetchBtn = document.getElementById("fetch");
+  const fetchInputBtn = document.getElementById("fetch-input");
+  const rephraseInputBtn = document.getElementById("rephrase-input");
   const output = document.getElementById("output");
+  // --- Rephrase Input Button Logic ---
+  rephraseInputBtn.addEventListener("click", async () => {
+    output.textContent = "Rephrasing input message...";
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0]) {
+        output.textContent = "No active tab found";
+        return;
+      }
+      const tabId = tabs[0].id;
+      // Get input box message
+      chrome.tabs.sendMessage(tabId, { type: "getInputBoxMessage" }, (inputBoxResponse) => {
+        if (chrome.runtime.lastError) {
+          output.textContent = "Error: " + chrome.runtime.lastError.message;
+          return;
+        }
+        const inputMessage = inputBoxResponse?.inputMessage?.trim();
+        if (!inputMessage) {
+          output.textContent = "No input box message found or input is empty.";
+          return;
+        }
+        // Get last 50 messages for tone profile
+  chrome.tabs.sendMessage(tabId, { type: "getMessages" }, async (response) => {
+          if (chrome.runtime.lastError) {
+            output.textContent = "Error: " + chrome.runtime.lastError.message;
+            return;
+          }
+          if (!response || !response.messages) {
+            output.textContent = "No messages found or content script not loaded.";
+            return;
+          }
+          const last50 = response.messages.slice(-50);
+          // Commented out analyzer part
+          // let toneProfile;
+          // let llmProfile;
+          // try {
+          //   toneProfile = await generateToneProfile(last50);
+          //   llmProfile = generateLLMToneProfile(toneProfile);
+          // } catch (e) {
+          //   output.textContent = "Error generating tone profile: " + e;
+          //   return;
+          // }
+          // Call Gemini API with recent messages
+          try {
+            const rephrased = await rephraseWithGemini(inputMessage, last50);
+            output.textContent = `Original:\n${inputMessage}\n\nRephrased:\n${rephrased}`;
+          } catch (e) {
+            output.textContent = "Gemini API error: " + e;
+          }
+        });
+      });
+    });
+  });
+
+  fetchInputBtn.addEventListener("click", () => {
+    output.textContent = "Fetching input box message...";
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0]) {
+        output.textContent = "No active tab found";
+        return;
+      }
+      const tabId = tabs[0].id;
+      function requestInputBoxMessage(retry) {
+        chrome.tabs.sendMessage(tabId, { type: "getInputBoxMessage" }, (inputBoxResponse) => {
+          if (chrome.runtime.lastError) {
+            if (!retry && chrome.runtime.lastError.message.includes("Receiving end does not exist")) {
+              chrome.scripting.executeScript({
+                target: { tabId },
+                files: ["content.js"]
+              }, () => {
+                if (chrome.runtime.lastError) {
+                  output.textContent = "Failed to inject content script: " + chrome.runtime.lastError.message;
+                  return;
+                }
+                requestInputBoxMessage(true);
+              });
+              return;
+            }
+            output.textContent = "Error: " + chrome.runtime.lastError.message + "\n(Try opening the chat or sending a message first.)";
+            return;
+          }
+          if (!inputBoxResponse) {
+            output.textContent = "Error: No response from content script.\n(Make sure the chat page is open and re-try.)";
+            return;
+          }
+          if (inputBoxResponse.inputMessage && inputBoxResponse.inputMessage.trim().length > 0) {
+            output.textContent = `Input Box Message:\n${inputBoxResponse.inputMessage}`;
+          } else {
+            output.textContent = "No input box message found or input is empty.";
+          }
+        });
+      }
+      requestInputBoxMessage(false);
+    });
+  });
 
   fetchBtn.addEventListener("click", () => {
     output.textContent = "Fetching...";
@@ -10,8 +109,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       const tabId = tabs[0].id;
-      function requestMessages(retry) {
-        chrome.tabs.sendMessage(tabId, { type: "getMessages" }, (response) => {
+
+      // Retrieve input box message first
+      chrome.tabs.sendMessage(tabId, { type: "getInputBoxMessage" }, (inputBoxResponse) => {
+        let inputBoxMessage = '';
+        if (inputBoxResponse && inputBoxResponse.inputMessage) {
+          inputBoxMessage = inputBoxResponse.inputMessage;
+        }
+        // Now proceed to fetch messages as before
+        function requestMessages(retry) {
+          chrome.tabs.sendMessage(tabId, { type: "getMessages" }, async (response) => {
           if (chrome.runtime.lastError) {
             if (!retry && chrome.runtime.lastError.message.includes("Receiving end does not exist")) {
               chrome.scripting.executeScript({
@@ -42,12 +149,16 @@ document.addEventListener("DOMContentLoaded", () => {
               return `${i + 1}. ${msg}`;
             }
           }).join("\n\n");
+
+          // --- Analyzer persistent tone profile logic commented out ---
+          // Display only recent messages for context
           output.textContent = titleStr + msgStr;
-          console.log("Recent 50 messages:", last50);
-        });
-      }
-      requestMessages(false);
-    });
-  });
-});
+        }); // end chrome.tabs.sendMessage
+      } // end requestMessages
+        requestMessages(false);
+      });
+    }); // end chrome.tabs.query
+  }); // end fetchBtn.addEventListener
+}); // end DOMContentLoaded
+console.log("popup.js loaded");
 console.log("popup.js loaded");
