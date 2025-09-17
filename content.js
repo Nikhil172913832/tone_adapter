@@ -167,3 +167,57 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   }
   return true;
 });
+
+// Rephrase button injection logic
+function createRephraseButton() {
+  const btn = document.createElement('button');
+  btn.className = 'tone-adapter-rephrase-btn';
+  btn.title = 'Rephrase this text';
+  btn.style.cssText = `
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: url(${chrome.runtime.getURL('icon.png')}) no-repeat center center;
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  `;
+  btn.addEventListener('mouseenter', () => btn.style.opacity = '1');
+  btn.addEventListener('mouseleave', () => btn.style.opacity = '0.6');
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const target = e.target._taTarget;
+    const message = target.value || target.innerText || '';
+    const msgs = getCurrentVisibleMessages(50);
+    chrome.runtime.sendMessage({ type: 'triggerRephrase', inputMessage: message, contextMessages: msgs });
+  });
+  return btn;
+}
+
+function attachRephraseButton(el) {
+  if (el._taAttached) return;
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  el.parentNode.insertBefore(wrapper, el);
+  wrapper.appendChild(el);
+  const btn = createRephraseButton();
+  btn._taTarget = el;
+  wrapper.appendChild(btn);
+  const rect = el.getBoundingClientRect();
+  btn.style.top = (el.offsetTop + 4) + 'px';
+  btn.style.left = (el.offsetLeft + el.offsetWidth - 24) + 'px';
+  el._taAttached = true;
+}
+
+function scanAndAttach() {
+  const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea, [contenteditable="true"]'));
+  inputs.forEach(attachRephraseButton);
+}
+
+// Observe DOM for new inputs
+const taObserver = new MutationObserver(scanAndAttach);
+taObserver.observe(document.body, { childList: true, subtree: true });
+// Initial attach
+scanAndAttach();

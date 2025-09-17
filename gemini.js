@@ -5,17 +5,13 @@
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 function getGeminiApiKey() {
-  // Try Vite/webpack style import.meta.env
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.GEMINI_API_KEY) {
-    return import.meta.env.GEMINI_API_KEY;
+  // Try window.env (for browser extensions with injected env)
+  if (typeof window !== 'undefined' && window.env && window.env.GEMINI_API_KEY) {
+    return window.env.GEMINI_API_KEY;
   }
   // Try process.env (Node, some bundlers)
   if (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) {
     return process.env.GEMINI_API_KEY;
-  }
-  // Try window.env (for browser extensions with injected env)
-  if (typeof window !== 'undefined' && window.env && window.env.GEMINI_API_KEY) {
-    return window.env.GEMINI_API_KEY;
   }
   // Try globalThis.env (for some bundlers)
   if (typeof globalThis !== 'undefined' && globalThis.env && globalThis.env.GEMINI_API_KEY) {
@@ -31,8 +27,30 @@ function getGeminiApiKey() {
  * @returns {Promise<string>} - The rephrased message.
  */
 export async function rephraseWithGemini(inputMessage, llmToneProfile) {
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const prompt = `You are an expert communication assistant.\n\nHere is a detailed tone profile describing the user's communication style:\n\n${llmToneProfile}\n\n---\n\nPlease rephrase the following message so that it matches the user's tone profile as closely as possible.\n\nMessage to rephrase:\n"""${inputMessage}"""\n\nRephrased message:`;
+  // const GEMINI_API_KEY = getGeminiApiKey();
+  const GEMINI_API_KEY = "AIzaSyC2Nk_HYq6p9RWSR3PbW4Ldn3XG_t2Renw";
+  const prompt = `You are an expert communication and tone adaptation assistant.
+
+Your job is to take an input message and rewrite it so it matches the speaker's tone, style, and phrasing as closely as possible.
+
+Context for tone and style (from previous chat history):
+${llmToneProfile}
+
+---
+Message to rephrase:
+"""${inputMessage}"""
+
+Guidelines:
+- Analyze the provided context carefully to infer tone (formality, directness, emotional vibe, word choice, sentence rhythm).
+- Preserve the *intent and meaning* of the original message.
+- Match the *style markers* of the speaker:
+  • Word choice (casual vs formal, technical vs simple).  
+  • Sentence structure (short, punchy vs long, flowing).  
+  • Level of politeness, assertiveness, or enthusiasm.  
+  • Use of contractions, slang, emojis, or punctuation style if present.  
+- Do not add explanations, only return the final rephrased message.
+
+Rephrased message:`;
 
   const body = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],

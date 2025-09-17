@@ -1,4 +1,4 @@
-import { generateToneProfile, generateLLMToneProfile } from './dist/analyzer/index.js';
+// import { generateToneProfile, generateLLMToneProfile } from './dist/analyzer/index.js';
 import { rephraseWithGemini } from './gemini.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
         // Get last 50 messages for tone profile
-        chrome.tabs.sendMessage(tabId, { type: "getMessages" }, async (response) => {
+  chrome.tabs.sendMessage(tabId, { type: "getMessages" }, async (response) => {
           if (chrome.runtime.lastError) {
             output.textContent = "Error: " + chrome.runtime.lastError.message;
             return;
@@ -37,18 +37,19 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
           const last50 = response.messages.slice(-50);
-          let toneProfile;
-          let llmProfile;
+          // Commented out analyzer part
+          // let toneProfile;
+          // let llmProfile;
+          // try {
+          //   toneProfile = await generateToneProfile(last50);
+          //   llmProfile = generateLLMToneProfile(toneProfile);
+          // } catch (e) {
+          //   output.textContent = "Error generating tone profile: " + e;
+          //   return;
+          // }
+          // Call Gemini API with recent messages
           try {
-            toneProfile = await generateToneProfile(last50);
-            llmProfile = generateLLMToneProfile(toneProfile);
-          } catch (e) {
-            output.textContent = "Error generating tone profile: " + e;
-            return;
-          }
-          // Call Gemini API to rephrase
-          try {
-            const rephrased = await rephraseWithGemini(inputMessage, llmProfile);
+            const rephrased = await rephraseWithGemini(inputMessage, last50);
             output.textContent = `Original:\n${inputMessage}\n\nRephrased:\n${rephrased}`;
           } catch (e) {
             output.textContent = "Gemini API error: " + e;
@@ -149,57 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }).join("\n\n");
 
-          // --- Persistent Tone Profile Logic ---
-          // Use chat title as chatId if available, else hash the last50 messages
-          function hashMessages(msgs) {
-            // Simple hash function for fallback
-            let str = JSON.stringify(msgs);
-            let hash = 0, i, chr;
-            for (i = 0; i < str.length; i++) {
-              chr = str.charCodeAt(i);
-              hash = ((hash << 5) - hash) + chr;
-              hash |= 0;
-            }
-            return 'chat_' + Math.abs(hash);
-          }
-          const chatId = response.title ? `chat_${response.title}` : hashMessages(last50);
-
-          // Try to load from storage first
-          let toneProfileStr = '';
-          let llmProfileStr = '';
-          chrome.storage.local.get([chatId], async (result) => {
-            if (result[chatId]) {
-              // Found cached profile
-              const cached = result[chatId];
-              toneProfileStr = `\n\n---\nTone Profile (cached):\n` + JSON.stringify(cached.toneProfile, null, 2);
-              try {
-                llmProfileStr = `\n\n---\nLLM Tone Profile:\n` + generateLLMToneProfile(cached.toneProfile);
-              } catch (e) {
-                llmProfileStr = `\n\n---\nLLM Tone Profile: Error generating LLM profile: ${e}`;
-              }
-              let inputBoxStr = inputBoxMessage ? `\n\n---\nInput Box Message:\n${inputBoxMessage}` : '';
-              output.textContent = titleStr + msgStr + inputBoxStr + toneProfileStr + llmProfileStr + "\n\n(Loaded from cache)";
-              return;
-            }
-            // Not cached, generate and store
-            try {
-              const toneProfile = await generateToneProfile(last50);
-              toneProfileStr = `\n\n---\nTone Profile:\n` + JSON.stringify(toneProfile, null, 2);
-              // Store in chrome.storage.local
-              chrome.storage.local.set({ [chatId]: { toneProfile, timestamp: Date.now() } });
-              try {
-                llmProfileStr = `\n\n---\nLLM Tone Profile:\n` + generateLLMToneProfile(toneProfile);
-              } catch (e) {
-                llmProfileStr = `\n\n---\nLLM Tone Profile: Error generating LLM profile: ${e}`;
-              }
-            } catch (e) {
-              toneProfileStr = `\n\n---\nTone Profile: Error generating tone profile: ${e}`;
-            }
-            let inputBoxStr = inputBoxMessage ? `\n\n---\nInput Box Message:\n${inputBoxMessage}` : '';
-            output.textContent = titleStr + msgStr + inputBoxStr + toneProfileStr + llmProfileStr;
-            console.log("Recent 50 messages:", last50);
-          });
-          // --- End Persistent Tone Profile Logic ---
+          // --- Analyzer persistent tone profile logic commented out ---
+          // Display only recent messages for context
+          output.textContent = titleStr + msgStr;
         }); // end chrome.tabs.sendMessage
       } // end requestMessages
         requestMessages(false);
